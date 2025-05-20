@@ -1,0 +1,31 @@
+#:import dp kivy.metrics.dp
+
+<LoadingScreen>:
+    # Fondo neutro
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    MDBoxLayout:
+        orientation: "vertical"
+        spacing: "24dp"
+        padding: "48dp"
+        adaptive_height: True
+        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+
+        # Spinner de Material Design
+        MDSpinner:
+            size_hint: None, None
+            size: dp(64), dp(64)
+            pos_hint: {"center_x": 0.5}
+            active: True
+
+        # Texto con segundos restantes
+        MDLabel:
+            text: "Procesando... " + str(root.remaining_time) + "s restantes"
+            halign: "center"
+            theme_text_color: "Secondary"
+            font_style: "Subtitle1"

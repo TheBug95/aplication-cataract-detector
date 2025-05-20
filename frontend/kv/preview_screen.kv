@@ -1,0 +1,44 @@
+#:import dp kivy.metrics.dp
+
+<PreviewScreen>:
+    # Fondo neutro
+    canvas.before:
+        Color:
+            rgba: 0.95, 0.95, 0.95, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    MDBoxLayout:
+        orientation: "vertical"
+        spacing: "24dp"
+        padding: "24dp"
+        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+        size_hint: 0.9, 0.9
+
+        # Widget de imagen. source se vincula a la propiedad image_source.
+        Image:
+            id: preview_img
+            source: root.image_source or "frontend/assets/placeholder.jpg"
+            allow_stretch: True
+            keep_ratio: True
+
+        MDBoxLayout:
+            size_hint_y: None
+            height: dp(56)
+            spacing: "24dp"
+            pos_hint: {"center_x": 0.5}
+
+            # Botón Retake
+            MDFillRoundFlatButton:
+                text: "Retake"
+                size_hint: None, None
+                size: dp(120), dp(48)
+                on_release: root.on_retake_button()
+
+            # Botón Analyze
+            MDFillRoundFlatButton:
+                text: "Analyze"
+                size_hint: None, None
+                size: dp(120), dp(48)
+                on_release: root.on_analyze_button()
