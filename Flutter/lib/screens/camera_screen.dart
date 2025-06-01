@@ -99,39 +99,129 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Cámara'),
-        actions: [
-          if (_capturedImage != null)
-            IconButton(
-              icon: const Icon(Icons.check),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProcessingScreen(
-                      imageFile: File(_capturedImage!.path),
-                    ),
-                  ),
-                );
-              },
-            ),
-        ],
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF111418)),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Iris Science',
+          style: TextStyle(
+            color: Color(0xFF111418),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
       ),
       body: _capturedImage != null
-          ? Center(
-        child: Image.file(File(_capturedImage!.path)),
-      )
-          : CameraPreview(_controller!),
-      floatingActionButton: _capturedImage == null
-          ? FloatingActionButton(
-        onPressed: _takePicture,
-        child: const Icon(Icons.camera),
-      )
-          : FloatingActionButton(
-        onPressed: () => setState(() => _capturedImage = null),
-        child: const Icon(Icons.refresh),
-      ),
+          ? Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.file(File(_capturedImage!.path)),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: const Color(0xFF111418),
+                            backgroundColor: const Color(0xFFF0F2F5),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          onPressed: () => setState(() => _capturedImage = null),
+                          child: const Text(
+                            'Retake',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: const Color(0xFF3D98F4),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 16,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProcessingScreen(
+                                imageFile: File(_capturedImage!.path),
+                              ),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'Accept',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )
+          : Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 24.0, bottom: 8.0),
+                  child: Center(
+                    child: Text(
+                      'Upload an image',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF111418),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: CameraPreview(_controller!),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                  child: ElevatedButton(
+                    onPressed: _takePicture,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF3D98F4),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      minimumSize: const Size.fromHeight(48),
+                    ),
+                    child: const Text(
+                      'Take a photo',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }

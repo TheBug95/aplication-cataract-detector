@@ -16,9 +16,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
   Future<void> _pickImage() async {
     try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-      );
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
       if (image != null) {
         setState(() {
@@ -26,54 +24,96 @@ class _GalleryScreenState extends State<GalleryScreen> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Galería'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF111418)),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Iris Science',
+          style: TextStyle(
+            color: Color(0xFF111418),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
         actions: [
           if (_selectedImage != null)
             IconButton(
-              icon: const Icon(Icons.check),
+              icon: const Icon(Icons.check, color: Color(0xFF3D98F4)),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProcessingScreen(
-                      imageFile: _selectedImage!,
-                    ),
+                    builder: (context) =>
+                        ProcessingScreen(imageFile: _selectedImage!),
                   ),
                 );
               },
             ),
         ],
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (_selectedImage != null)
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Image.file(
-                  _selectedImage!,
-                  width: 300,
-                  height: 300,
-                  fit: BoxFit.cover,
-                ),
-              )
-            else
-              const Text('No hay imagen seleccionada'),
-
+            const Text(
+              'Upload an image',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF111418),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: Center(
+                child: _selectedImage != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.file(
+                          _selectedImage!,
+                          width: double.infinity,
+                          fit: BoxFit.contain,
+                        ),
+                      )
+                    : const Text(
+                        'No image selected',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _pickImage,
-              child: const Text('Abrir Galería'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF3D98F4),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                minimumSize: const Size.fromHeight(48),
+              ),
+              child: const Text(
+                'Open Gallery',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
