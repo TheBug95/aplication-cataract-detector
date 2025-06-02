@@ -12,28 +12,28 @@ class ProcessingScreen extends StatefulWidget {
 }
 
 class _ProcessingScreenState extends State<ProcessingScreen> {
-  int _count = 5;
+  double _progress = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _startCountdown();
+    _startSmoothProgress();
   }
 
-  void _startCountdown() {
-    Future.delayed(const Duration(seconds: 1), () {
+  void _startSmoothProgress() {
+    Future.delayed(const Duration(milliseconds: 100), () {
       if (!mounted) return;
 
       setState(() {
-        _count--;
+        _progress += 0.02; // Aumenta el progreso en 2% cada 100 ms
       });
 
-      if (_count > 0) {
-        _startCountdown();
+      if (_progress < 1.0) {
+        _startSmoothProgress();
       } else {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const ResultScreen()),
+          MaterialPageRoute(builder: (context) => const DiagnosisResultsScreen()),
         );
       }
     });
@@ -42,20 +42,53 @@ class _ProcessingScreenState extends State<ProcessingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Procesando'),
+        backgroundColor: Colors.white,
+        elevation: 1,
+        title: const Center(
+          child: Text(
+            'Iris Science',
+            style: TextStyle(
+              color: Color(0xFF111418),
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
+            ),
+          ),
+        ),
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Image.file(widget.imageFile, width: 200, height: 200),
-            const SizedBox(height: 20),
-            const CircularProgressIndicator(),
-            const SizedBox(height: 20),
-            Text(
-              'Procesando... $_count',
-              style: const TextStyle(fontSize: 24),
+            const SizedBox(height: 16),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.file(widget.imageFile, width: 200, height: 200),
+            ),
+            const SizedBox(height: 24),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Analyzing image...',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF111418),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: _progress,
+                minHeight: 8,
+                backgroundColor: Color(0xFFdbe0e6),
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF111418)),
+              ),
             ),
           ],
         ),

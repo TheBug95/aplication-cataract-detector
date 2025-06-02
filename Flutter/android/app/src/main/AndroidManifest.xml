@@ -21,7 +21,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
-        android:label="pruebas2"
+        android:label="Iriscience"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
