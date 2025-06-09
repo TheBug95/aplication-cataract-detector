@@ -1,11 +1,39 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 
 class DiagnosisResultsScreen extends StatelessWidget {
-  const DiagnosisResultsScreen({Key? key}) : super(key: key);
+  final Map<String, dynamic> apiResponse;
+  final File imageFile;
+
+  const DiagnosisResultsScreen({
+    Key? key,
+    required this.apiResponse,
+    required this.imageFile,
+  }) : super(key: key);
+
+  Color _getConfidenceColor(double confidence) {
+    if (confidence < 0.5) return Colors.red;
+    if (confidence < 0.8) return Colors.orange;
+    return Colors.green;
+  }
+
+  String _getDiagnosisMessage(String diagnosis) {
+    switch (diagnosis.toLowerCase()) {
+      case 'cataract':
+        return 'Our analysis detected signs of cataracts. Cataracts are a clouding of the eye\'s natural lens. We recommend scheduling an appointment with an ophthalmologist for a comprehensive eye examination. Early detection and treatment can help preserve your vision.';
+      default:
+        return 'Based on the analysis of your iris scans, your eye health appears normal. However, regular eye check-ups are recommended to maintain optimal eye health.';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final result = apiResponse['result'] ?? {};
+    final diagnosis = result['diagnosis']?.toString() ?? 'No diagnosis';
+    final confidence = double.tryParse(result['confidence']?.toString() ?? '0') ?? 0;
+    final confidencePercentage = (confidence * 100).toStringAsFixed(0);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -42,112 +70,76 @@ class DiagnosisResultsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              
-              // Images section - Mejorado y responsive
+
+              // Original image section
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    // Primera imagen
-                    Container(
-                      width: double.infinity,
-                      height: MediaQuery.of(context).size.width * 0.6, // Responsive height
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.3),
-                            spreadRadius: 2,
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
+                child: Container(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.width * 0.6,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.3),
+                        spreadRadius: 2,
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.file(
+                      imageFile,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[200],
+                          child: const Center(
+                            child: Icon(
+                              Icons.image_not_supported,
+                              size: 50,
+                              color: Colors.grey,
+                            ),
                           ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          'assets/images/ojo1.png',
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey[200],
-                              child: const Center(
-                                child: Icon(
-                                  Icons.image_not_supported,
-                                  size: 50,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                        );
+                      },
                     ),
-                    
-                    // Segunda imagen
-                    Container(
-                      width: double.infinity,
-                      height: MediaQuery.of(context).size.width * 0.6, // Responsive height
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.3),
-                            spreadRadius: 2,
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          'assets/images/ojo2.png',
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey[200],
-                              child: const Center(
-                                child: Icon(
-                                  Icons.image_not_supported,
-                                  size: 50,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-              
-              // Stats cards - Mejorados para ser responsive
+
+              // Stats cards
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    // Si la pantalla es muy pequeña, apilar las tarjetas verticalmente
                     if (constraints.maxWidth < 400) {
                       return Column(
                         children: [
-                          _buildStatCard('Overall Health', 'Good', Colors.green),
+                          _buildStatCard('Diagnosis', diagnosis, Colors.blue),
                           const SizedBox(height: 12),
-                          _buildStatCard('Risk Score', '15%', Colors.orange),
+                          _buildStatCard(
+                            'Confidence',
+                            '$confidencePercentage%',
+                            _getConfidenceColor(confidence),
+                          ),
                         ],
                       );
                     } else {
-                      // Pantallas más grandes: lado a lado
                       return Row(
                         children: [
                           Expanded(
-                            child: _buildStatCard('Overall Health', 'Good', Colors.green),
+                            child: _buildStatCard('Diagnosis', diagnosis, Colors.blue),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
-                            child: _buildStatCard('Risk Score', '15%', Colors.orange),
+                            child: _buildStatCard(
+                              'Confidence',
+                              '$confidencePercentage%',
+                              _getConfidenceColor(confidence),
+                            ),
                           ),
                         ],
                       );
@@ -155,8 +147,8 @@ class DiagnosisResultsScreen extends StatelessWidget {
                   },
                 ),
               ),
-              
-              // Description text - Mejorado
+
+              // Description text
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
                 child: Container(
@@ -166,11 +158,9 @@ class DiagnosisResultsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.blue[100]!),
                   ),
-                  child: const Text(
-                    'Based on the analysis of your iris scans, your overall health is rated as good. '
-                    'However, there is a 15% risk score for potential health issues. We recommend consulting '
-                    'with a healthcare professional for further evaluation and personalized advice.',
-                    style: TextStyle(
+                  child: Text(
+                    _getDiagnosisMessage(diagnosis),
+                    style: const TextStyle(
                       fontSize: 16,
                       color: Color(0xFF111418),
                       height: 1.5,
@@ -178,15 +168,14 @@ class DiagnosisResultsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              
-              // Button - Mejorado
+
+              // Button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Handle consultation scheduling
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Scheduling consultation...'),
@@ -213,9 +202,6 @@ class DiagnosisResultsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              
-              // Espacio adicional al final
-              const SizedBox(height: 20),
             ],
           ),
         ),

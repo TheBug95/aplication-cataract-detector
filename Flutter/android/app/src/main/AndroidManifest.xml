@@ -2,6 +2,8 @@
     <!-- Para Android 10 y anteriores (opcional pero recomendado para compatibilidad) -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!-- Para Android 13+ (Photo Picker) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
@@ -21,6 +23,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
+        android:networkSecurityConfig="@xml/network_security_config"
         android:label="Iriscience"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
